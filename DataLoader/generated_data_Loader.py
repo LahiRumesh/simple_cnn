@@ -22,43 +22,8 @@ parser.add_argument("--TESTING_DATA", type=str, default="training_data.npy", hel
 parser.add_argument("--TRAINING_DATA", type=str, default="testing_data.npy", help="output numpy testing data file name")
 args = parser.parse_args()
 
-if not os.path.exists(args.SAVE_DATA_FOLDER):
-    os.makedirs(args.SAVE_DATA_FOLDER)
-    
-def generate_data(DATA_FOLDER,IMAGE_SIZE,TEST_SIZE):
-
-    classes=os.listdir(DATA_FOLDER)
-    full_path=list(os.path.join(DATA_FOLDER,i) for i in classes)
-    with open(os.path.join(args.SAVE_DATA_FOLDER,args.CLASSES_FILE), 'w') as f:
-        for i,data in enumerate(classes):
-            f.write("%s\n" % data)
-
-    data_list=[]
-    labels = {full_path[x]:x for x in range(len(full_path))}
-    for label in labels:
-        for f in tqdm(os.listdir(label)):
-            try:
-                path=os.path.join(label,f)
-                img=cv2.imread(path)
-                img=cv2.resize(img,(IMAGE_SIZE,IMAGE_SIZE))
-                data_list.append([np.array(img),labels[label]])
-
-            except Exception as e:
-                pass
-
-    np.random.shuffle(data_list)
-    test_size=int(len(data_list)*TEST_SIZE)
-    training_data,testing_data=data_list[test_size:],data_list[:test_size]
-
-    return training_data,testing_data
-
-
-training_data,testing_data=generate_data(args.DATA_FOLDER,args.IMAGE_SIZE,args.TEST_SIZE)
-    
-if args.SAVE_DATA: #store data in a numpy array
-    np.save(os.path.join(args.SAVE_DATA_FOLDER,args.TRAINING_DATA),training_data) #Save training data to numpy array
-    np.save(os.path.join(args.SAVE_DATA_FOLDER,args.TESTING_DATA),testing_data) #Save testing data to numpy array
-
+training_data=np.load(os.path.join(args.SAVE_DATA_FOLDER,args.TRAINING_DATA),allow_pickle=True)
+testing_data=np.load(os.path.join(args.SAVE_DATA_FOLDER,args.TESTING_DATA),allow_pickle=True)
 
 class Classification_DATASET(Dataset):
     def __init__(self,data_set,transform=None):
@@ -88,6 +53,8 @@ data_transform = transforms.Compose([
 
 train_data = Classification_DATASET(training_data)
 test_data = Classification_DATASET(testing_data)
+
+print(train_data)
 
 train_loader = DataLoader(train_data, batch_size=2, shuffle=False)
 test_loader = DataLoader(test_data, batch_size=2, shuffle=True)
