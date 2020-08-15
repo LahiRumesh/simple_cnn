@@ -9,22 +9,24 @@ import torch.optim as optim
 from torch.optim import lr_scheduler
 from torch.utils.data import Dataset,DataLoader
 from torchvision import transforms
+import configparser
 
-GENERATE_DATA=True#rearrange training and testing numpy data sets
-SAVE_DATA=True
-LOAD_DATA=True
+config = configparser.ConfigParser()
+config.read('../user_inputs.ini')
 
 parser=argparse.ArgumentParser()
-parser.add_argument("--Data_Folder", type=str, default="../Data", help="Training Images folder")
-parser.add_argument("--IMAGE_SIZE", type=str, default=100, help="Image Size")
-parser.add_argument("--TEST_SIZE", type=float, default=0.4, help="Testing data percentage")
+parser.add_argument("--DATA_FOLDER", type=str, default=config.get('DataLoader','DATA_FOLDER'), help="Training Images folder")
+parser.add_argument("--IMAGE_SIZE", type=str, default=config.getint('DataLoader','IMAGE_SIZE'), help="Image Size")
+parser.add_argument("--TEST_SIZE", type=float, default=config.getfloat('DataLoader','TEST_SIZE'), help="Testing data percentage")
+parser.add_argument("--SAVE_DATA", type=bool, default=config.getboolean('DataLoader','SAVE_DATA'), help="Save data to numpy array")
+
 args = parser.parse_args()
 
     
-def generate_data(Data_Folder,IMAGE_SIZE,TEST_SIZE):
+def generate_data(DATA_FOLDER,IMAGE_SIZE,TEST_SIZE):
 
-    classes=os.listdir(Data_Folder)
-    full_path=list(os.path.join(Data_Folder,i) for i in classes)
+    classes=os.listdir(DATA_FOLDER)
+    full_path=list(os.path.join(DATA_FOLDER,i) for i in classes)
     with open('classes.txt', 'w') as f:
         for i,data in enumerate(classes):
             f.write("%s\n" % data)
@@ -47,11 +49,11 @@ def generate_data(Data_Folder,IMAGE_SIZE,TEST_SIZE):
     training_data,testing_data=data_list[test_size:],data_list[:test_size]
 
     return training_data,testing_data
- 
 
-training_data,testing_data=generate_data(args.Data_Folder,args.IMAGE_SIZE,args.TEST_SIZE)
+
+training_data,testing_data=generate_data(args.DATA_FOLDER,args.IMAGE_SIZE,args.TEST_SIZE)
     
-if SAVE_DATA: #store data in a numpy array
+if args.SAVE_DATA: #store data in a numpy array
     np.save("training_data.npy",training_data) #Save training data to numpy array
     np.save("testing_data.npy",testing_data) #Save testing data to numpy array
 
