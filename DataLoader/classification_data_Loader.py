@@ -2,18 +2,19 @@ import os
 import numpy as np
 from tqdm import tqdm
 import cv2
-import argparse
 import torch
 from torch.utils.data import Dataset,DataLoader
 from torchvision import transforms
-import configparser
 
 
-def generate_data(DATA_FOLDER,IMAGE_SIZE=224,TEST_SIZE=0.1,SAVE_DATA=False):
+def generate_data(DATA_FOLDER,IMAGE_SIZE=224,TEST_SIZE=0.1,SAVE_DATA=True,CLASSES_FILE="classes.txt",OUT_DATA="../generated_data"):
+
+    if not os.path.exists(OUT_DATA):
+        os.makedirs(OUT_DATA)
 
     classes=os.listdir(DATA_FOLDER)
     full_path=list(os.path.join(DATA_FOLDER,i) for i in classes)
-    with open(os.path.join(args.SAVE_DATA_FOLDER,args.CLASSES_FILE), 'w') as f:
+    with open(os.path.join(OUT_DATA,CLASSES_FILE), 'w') as f:
         for i,data in enumerate(classes):
             f.write("%s\n" % data)
 
@@ -34,8 +35,8 @@ def generate_data(DATA_FOLDER,IMAGE_SIZE=224,TEST_SIZE=0.1,SAVE_DATA=False):
     test_size=int(len(data_list)*TEST_SIZE)
     training_data,testing_data=data_list[test_size:],data_list[:test_size]
     if SAVE_DATA:
-        np.save("training_data.npy",training_data)
-        np.save("testing_data.npy",testing_data)
+        np.save(os.path.join(OUT_DATA,"training_data2.npy"),training_data)
+        np.save(os.path.join(OUT_DATA,"testing_data2.npy"),testing_data)
 
 
     return training_data,testing_data
@@ -66,7 +67,7 @@ data_transform = transforms.Compose([
     ])
 
 
-training_data,testing_data=generate_data(args.DATA_FOLDER,args.IMAGE_SIZE,args.TEST_SIZE)
+training_data,testing_data=generate_data("../Data")
 
 
 train_loader = DataLoader(Classification_DATASET(training_data), batch_size=2, shuffle=False)
