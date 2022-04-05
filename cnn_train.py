@@ -12,9 +12,12 @@ import os
 import copy
 import torch.onnx as torch_onnx
 from torch.autograd import Variable
-
+from config import cfg
+import wandb
 cudnn.benchmark = True
 plt.ion()   # interactive mode
+wandb.login() #login to wandb account
+
 
 
 
@@ -32,6 +35,8 @@ class CNN_Trainer():
         self.dataset_sizes = {x: len(self.image_datasets[x]) for x in ['train', 'val']}
         self.class_names = self.image_datasets['train'].classes
         self.checkpoints_dir = os.path.join("models", os.path.basename(self.image_dir))
+        wandb.init(project=f"simple_cnn-{os.path.basename(self.image_dir)}".replace("/", "-"), config=cfg)
+        
         try:
             os.makedirs(self.checkpoints_dir, exist_ok=True)
         except OSError:
@@ -41,6 +46,7 @@ class CNN_Trainer():
                         optimizer, scheduler, num_epochs=25,
                         batch_size=4,
                         shuffle=True,num_workers=4):
+
 
         dataloaders = {x: torch.utils.data.DataLoader(self.image_datasets[x], batch_size=batch_size,
                                              shuffle=shuffle, num_workers=num_workers)
@@ -53,6 +59,8 @@ class CNN_Trainer():
         num_ftrs = model.fc.in_features
         model.fc = nn.Linear(num_ftrs, len(self.class_names))
         model = model.to(device)
+
+        wandb.watch(model, criterion, log="all", log_freq=10)
 
         since = time.time()
 
@@ -104,6 +112,10 @@ class CNN_Trainer():
 
                 print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
 
+                wandb.log({"train_loss": epoch_loss,
+                       "train_accuracy" : epoch_acc
+                        })
+
                 # deep copy the model
                 if phase == 'val' and epoch_acc > best_acc:
                     best_acc = epoch_acc
@@ -123,9 +135,9 @@ class CNN_Trainer():
 
     def onnx_export(self,model,img_size=224):
 
+        input_shape = (3, img_size, img_size)
         model_prefix = os.path.basename(self.image_dir)
         onnx_model = os.path.join(self.checkpoints_dir, f'{model_prefix}.onnx')
-        input_shape = (3, img_size, img_size)
         dummy_input = Variable(torch.randn(1, *input_shape,device="cuda"))
         torch_onnx.export(model, 
                           dummy_input, 
@@ -136,37 +148,46 @@ class CNN_Trainer():
 
 if __name__ == '__main__':
 
-
-    data_dir = 'data'
-    img_size = 224
+    '''
     data_transforms = {
         'train': transforms.Compose([
             transforms.Resize((img_size,img_size)),
+            transforms.Grayscale(num_output_channels=1),
+            transforms.ToTensor()
+        ]),
+        'val': transforms.Compose([
+            transforms.Resize((img_size,img_size)),
+            transforms.Grayscale(num_output_channels=1),
+            transforms.ToTensor()
+        ]),
+    }
+    '''
+    data_transforms = {
+        'train': transforms.Compose([
+            transforms.Resize((cfg.image_size,cfg.image_size)),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ]),
         'val': transforms.Compose([
-            transforms.Resize((img_size,img_size)),
+            transforms.Resize((cfg.image_size,cfg.image_size)),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ]),
     }
 
-
-    train_CNN = CNN_Trainer(data_dir,data_transforms)
+    train_CNN = CNN_Trainer(cfg.data_dir,data_transforms)
     
     # model initilization
-    
-    model_ft = models.resnet50(pretrained=True)
-    criterion = nn.CrossEntropyLoss()
+    model = getattr(models, cfg.model)(pretrained=cfg.pretrained)
+    loss_criterion = getattr(nn, cfg.loss_criterion)()
+    optimizer = getattr(optim, cfg.optimizer)(model.parameters(),
+                                             lr=cfg.learning_rate, momentum=cfg.momentum, 
+                                             weight_decay=cfg.weight_decay)
+   
+    # Decay Learning Rate
+    exp_lr_scheduler = getattr(lr_scheduler, cfg.lr_scheduler)(optimizer, step_size=cfg.steps, gamma=cfg.gamma)
 
-    # Optimized parameters with LR
-    optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
+    cnn_model = train_CNN.train_model(model,loss_criterion,optimizer,exp_lr_scheduler,num_epochs=cfg.epochs)
 
-    # Decay LR by a factor of 0.1 every 7 epochs
-    exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
-
-    cnn_model = train_CNN.train_model(model_ft,criterion,optimizer_ft,exp_lr_scheduler,num_epochs=100)
-
-    # export the ONNX model after training
-    train_CNN.onnx_export(cnn_model,img_size=img_size)
+    # export the ONNX model
+    train_CNN.onnx_export(cnn_model,img_size=cfg.image_size)
