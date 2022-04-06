@@ -55,28 +55,28 @@ class CNN_Trainer():
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         inputs, classes = next(iter(dataloaders['train']))
         out = torchvision.utils.make_grid(inputs)
+        images = wandb.Image(out, caption=f"Sample_Batch-{os.path.basename(self.image_dir)}")
         
         num_ftrs = model.fc.in_features
         model.fc = nn.Linear(num_ftrs, len(self.class_names))
         model = model.to(device)
 
         wandb.watch(model, criterion, log="all", log_freq=10)
-
-        since = time.time()
+        wandb.log({"images": images
+                        })
 
         best_model_wts = copy.deepcopy(model.state_dict())
         best_acc = 0.0
 
         for epoch in range(num_epochs):
             print(f'Epoch {epoch}/{num_epochs - 1}')
-            print('-' * 10)
+            print('*' * 15)
 
-            # Each epoch has a training and validation phase
             for phase in ['train', 'val']:
                 if phase == 'train':
-                    model.train()  # Set model to training mode
+                    model.train()  # training mode
                 else:
-                    model.eval()   # Set model to evaluate mode
+                    model.eval()   # evaluate mode
 
                 running_loss = 0.0
                 running_corrects = 0
@@ -85,23 +85,17 @@ class CNN_Trainer():
                 for inputs, labels in dataloaders[phase]:
                     inputs = inputs.to(device)
                     labels = labels.to(device)
-
-                    # zero the parameter gradients
                     optimizer.zero_grad()
-
-                    # forward
-                    # track history if only in train
                     with torch.set_grad_enabled(phase == 'train'):
                         outputs = model(inputs)
                         _, preds = torch.max(outputs, 1)
                         loss = criterion(outputs, labels)
 
-                        # backward + optimize only if in training phase
                         if phase == 'train':
                             loss.backward()
                             optimizer.step()
 
-                    # statistics
+                    # statistics and wandb logs
                     running_loss += loss.item() * inputs.size(0)
                     running_corrects += torch.sum(preds == labels.data)
                 if phase == 'train':
@@ -111,31 +105,33 @@ class CNN_Trainer():
                 epoch_acc = running_corrects.double() / self.dataset_sizes[phase]
 
                 print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
-
-                wandb.log({"train_loss": epoch_loss,
-                       "train_accuracy" : epoch_acc
+                if phase == 'train':
+                    wandb.log({"train_loss": epoch_loss,
+                        "train_accuracy" : epoch_acc
                         })
 
                 # deep copy the model
                 if phase == 'val' and epoch_acc > best_acc:
+                    wandb.log({"val_loss": epoch_loss,
+                                "val_accuracy" : epoch_acc
+                                })
+
                     best_acc = epoch_acc
                     best_model_wts = copy.deepcopy(model.state_dict())
 
             print()
 
-        time_elapsed = time.time() - since
-        print(f'Training complete in {time_elapsed // 60:.0f}m {time_elapsed % 60:.0f}s')
         print(f'Best val Acc: {best_acc:4f}')
 
-        # load best model weights
+        # load best model weights and return for export
         model.load_state_dict(best_model_wts)
         return model
 
 
 
-    def onnx_export(self,model,img_size=224):
+    def onnx_export(self,model,img_size=224,c_in=3):
 
-        input_shape = (3, img_size, img_size)
+        input_shape = (c_in, img_size, img_size)
         model_prefix = os.path.basename(self.image_dir)
         onnx_model = os.path.join(self.checkpoints_dir, f'{model_prefix}.onnx')
         dummy_input = Variable(torch.randn(1, *input_shape,device="cuda"))
