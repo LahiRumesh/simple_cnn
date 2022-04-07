@@ -1,6 +1,6 @@
 # Simple CNN
 
-### ```Simple CNN ``` is a pipeline which can be use to train and infer CNN models by use of PyTorch and ONNX. It's simple and easy to USE !!! 🔥🔥
+#### ```Simple CNN``` is a pipeline which can be use to train and infer CNN models by use of PyTorch and ONNX. It's simple and easy to USE !!! 🔥🔥
 ___
 ### Install
 
@@ -13,5 +13,25 @@ ___
 ```
 ---
 
+### Data Preparation
+
+- Split images into **train** and **val** folders in the Image Folder  
+
+ * #### Image Folder
+    * **train**
+      * image1.jpg
+      * image2.jpg
+      * image3.jpg
+      * ..............
+    * **val**
+      * image101.jpg
+      * image102.jpg
+      * image103.jpg
+      * ..............
+
+---
+
 ### Training
- - 
+ -
+ 
+ 
