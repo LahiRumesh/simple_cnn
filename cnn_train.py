@@ -3,19 +3,18 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.optim import lr_scheduler
 import torch.backends.cudnn as cudnn
-import numpy as np
 import torchvision
 from torchvision import datasets, models, transforms
-import matplotlib.pyplot as plt
-import time
 import os
 import copy
 import torch.onnx as torch_onnx
 from torch.autograd import Variable
 from config import cfg
 import wandb
+from tqdm import tqdm
+from time import sleep
+from log_data import model_configs, wandb_logs, get_accuracy
 cudnn.benchmark = True
-plt.ion()   # interactive mode
 wandb.login() #login to wandb account
 
 
@@ -35,6 +34,9 @@ class CNN_Trainer():
         self.dataset_sizes = {x: len(self.image_datasets[x]) for x in ['train', 'val']}
         self.class_names = self.image_datasets['train'].classes
         self.checkpoints_dir = os.path.join("models", os.path.basename(self.image_dir))
+        with open(os.path.join(self.checkpoints_dir,'classes.txt'), 'w') as f:
+            for i,data in enumerate(self.class_names):
+                f.write("%s\n" % data)
         wandb.init(project=f"simple_cnn-{os.path.basename(self.image_dir)}".replace("/", "-"), config=cfg)
         
         try:
@@ -52,7 +54,7 @@ class CNN_Trainer():
                                              shuffle=shuffle, num_workers=num_workers)
                             for x in ['train', 'val']}
 
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        device = torch.device(f"cuda:{cfg.device}" if torch.cuda.is_available() else "cpu")
         inputs, classes = next(iter(dataloaders['train']))
         out = torchvision.utils.make_grid(inputs)
         images = wandb.Image(out, caption=f"Sample_Batch-{os.path.basename(self.image_dir)}")
@@ -61,16 +63,17 @@ class CNN_Trainer():
         model.fc = nn.Linear(num_ftrs, len(self.class_names))
         model = model.to(device)
 
+        
         wandb.watch(model, criterion, log="all", log_freq=10)
         wandb.log({"images": images
                         })
-
+        
+        model_configs(cfg=cfg)
         best_model_wts = copy.deepcopy(model.state_dict())
         best_acc = 0.0
 
         for epoch in range(num_epochs):
-            print(f'Epoch {epoch}/{num_epochs - 1}')
-            print('*' * 15)
+            print(f'Epoch {epoch+1}')
 
             for phase in ['train', 'val']:
                 if phase == 'train':
@@ -82,7 +85,7 @@ class CNN_Trainer():
                 running_corrects = 0
 
                 # Iterate over data.
-                for inputs, labels in dataloaders[phase]:
+                for inputs, labels in tqdm(dataloaders[phase]):
                     inputs = inputs.to(device)
                     labels = labels.to(device)
                     optimizer.zero_grad()
@@ -104,24 +107,23 @@ class CNN_Trainer():
                 epoch_loss = running_loss / self.dataset_sizes[phase]
                 epoch_acc = running_corrects.double() / self.dataset_sizes[phase]
 
-                print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
-                if phase == 'train':
-                    wandb.log({"train_loss": epoch_loss,
-                        "train_accuracy" : epoch_acc
-                        })
+                get_accuracy(phase,epoch_loss,epoch_acc)
+                wandb_logs(phase,epoch_loss,epoch_acc) # wandb log loss and accuracy
+                #print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
 
                 # deep copy the model
                 if phase == 'val' and epoch_acc > best_acc:
-                    wandb.log({"val_loss": epoch_loss,
-                                "val_accuracy" : epoch_acc
-                                })
-
                     best_acc = epoch_acc
                     best_model_wts = copy.deepcopy(model.state_dict())
 
             print()
-
-        print(f'Best val Acc: {best_acc:4f}')
+        
+        try:
+            print(f'Best Val Accuracy: {best_acc:4f}')
+        
+        except KeyboardInterrupt:
+            print(f'Best Val Accuracy: {best_acc:4f} Training Interrupted... Exporting ONNX model')
+        
 
         # load best model weights and return for export
         model.load_state_dict(best_model_wts)
@@ -129,35 +131,26 @@ class CNN_Trainer():
 
 
 
-    def onnx_export(self,model,img_size=224,c_in=3):
+    def onnx_export(self,model,img_size=224,c_in=3,):
 
         input_shape = (c_in, img_size, img_size)
         model_prefix = os.path.basename(self.image_dir)
-        onnx_model = os.path.join(self.checkpoints_dir, f'{model_prefix}.onnx')
+        counter = 1
+    
+        while os.path.exists(os.path.join(self.checkpoints_dir, f'{model_prefix + "_exp_" + str(counter)}.onnx')):
+            counter += 1
+        
         dummy_input = Variable(torch.randn(1, *input_shape,device="cuda"))
         torch_onnx.export(model, 
                           dummy_input, 
-                          onnx_model, 
+                          os.path.join(self.checkpoints_dir,f'{model_prefix + "_exp_" + str(counter)}.onnx'), 
                           verbose=False)
-        print("onnx model successfully exported !")
+        print(f"{model_prefix}_exp_" + str(counter)+ ".onnx model successfully exported !")
 
 
 if __name__ == '__main__':
 
-    '''
-    data_transforms = {
-        'train': transforms.Compose([
-            transforms.Resize((img_size,img_size)),
-            transforms.Grayscale(num_output_channels=1),
-            transforms.ToTensor()
-        ]),
-        'val': transforms.Compose([
-            transforms.Resize((img_size,img_size)),
-            transforms.Grayscale(num_output_channels=1),
-            transforms.ToTensor()
-        ]),
-    }
-    '''
+
     data_transforms = {
         'train': transforms.Compose([
             transforms.Resize((cfg.image_size,cfg.image_size)),
