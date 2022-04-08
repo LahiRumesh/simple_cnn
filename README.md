@@ -15,7 +15,7 @@ ___
 
 ### Data Preparation
 
-- Split images into **train** and **val** folders in the Image Folder  
+- Split images into **train** and **val** folders in the Image Folder 📂
 
  * #### Image Folder
     * **train**
@@ -32,6 +32,22 @@ ___
 ---
 
 ### Training
- -
- 
- 
+  #### After the data preparation, it's time for the training !  
+- Use the **config.py** to set the parameters, here are few parameters.
+     
+ ```bash
+    cfg.data_dir = 'Data/Images/Image_Folder' # Image Folder path which contain train and val folders 
+    cfg.device = '0' # cuda device, i.e. 0 or 0,1,2,3    
+    cfg.image_size = 224 #input image size
+    cfg.batch_size = 8 # batch size
+    cfg.epochs = 50 #number of epochs
+
+    cfg.model = 'resnet18' # torch vision classification model architectures for image classification 
+                           # i.e. resnet18 or vgg16, alexnet, googlenet, resnet50
+
+    cfg.pretrained = True  # use pretrained weights for training-                    
+```
+- Please checkout for more [MODELS AND PRE-TRAINED WEIGHTS](https://pytorch.org/vision/stable/models.html) from PyTorch 
+
+Run **cnn_train.py** to start the training, all the logs will be save in [wandb](https://wandb.ai/site), and ONNX weight files will save in the "**_models/Image_Folder_**" folder for each training experiments. 
+
