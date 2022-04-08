@@ -3,12 +3,12 @@ from easydict import EasyDict
 
 cfg = EasyDict()
 
-cfg.data_dir = 'data_dir'
-cfg.device = '0' # cuda device, i.e. 0 or 0,1,2,3 or cpu
+cfg.data_dir = 'data_dir' # Image Folder path which contain train and val folders
+cfg.device = '0' # cuda device, i.e. 0 or 0,1,2,3 
 
-cfg.image_size = 224
-cfg.batch_size = 4
-cfg.epochs = 25
+cfg.image_size = 224 #input image size
+cfg.batch_size = 4 # batch size
+cfg.epochs = 10 #number of epochs
 cfg.learning_rate = 0.001
 cfg.momentum = 0.9
 cfg.weight_decay = 0
