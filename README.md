@@ -43,7 +43,7 @@ ___
     cfg.epochs = 50 #number of epochs
 
     cfg.model = 'resnet18' # torch vision classification model architectures for image classification 
-                           # i.e. resnet18 or vgg16, alexnet, googlenet, resnet50
+                           # i.e. resnet18 or resnet50, resnet101, resnet152
 
     cfg.pretrained = True  # use pretrained weights for training-                    
 ```
