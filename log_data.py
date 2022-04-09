@@ -15,7 +15,14 @@ def model_configs(cfg):
                     ["Image Size",cfg.image_size],
                     ["Epochs",cfg.epochs],
                     ["Learning Rate",cfg.learning_rate],
-                    ["Use Pretrained",cfg.pretrained]]
+                    ["Use Pretrained",cfg.pretrained],
+                    ["Momentum",cfg.momentum],
+                    ["Weight Decay",cfg.weight_decay],
+                    ["Loss Function",cfg.loss_criterion],
+                    ["Optimizer",cfg.optimizer],
+                    ["Learning Rate Decay",cfg.lr_scheduler],
+                    ["Decay epochs ",cfg.steps],
+                    ["Decay Learning Rate factor ",cfg.optimizer]]
     print(tabulate(config_table,tablefmt="fancy_grid"))
 
 
