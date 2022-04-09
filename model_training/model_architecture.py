@@ -35,7 +35,6 @@ class ModelArchitecture():
             model.classifier = nn.Linear(num_ftrs, out_features)
 
         else:
-            
             print('Available Models')
             model_table = [["Resnet",["resnet18","resnet34","resnet50","resnet101","resnet152"]],
                           ["VGG",["vgg13","vgg13_bn","vgg16","vgg16_bn","vgg19","vgg19_bn"]],
