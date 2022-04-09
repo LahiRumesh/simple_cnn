@@ -1,3 +1,4 @@
+from statistics import mode
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -14,6 +15,7 @@ import wandb
 from tqdm import tqdm
 from time import sleep
 from log_data import model_configs, wandb_logs, get_accuracy
+from model_training.model_architecture import ModelArchitecture
 cudnn.benchmark = True
 wandb.login() #login to wandb account
 
@@ -37,8 +39,7 @@ class CNN_Trainer():
         with open(os.path.join(self.checkpoints_dir,'classes.txt'), 'w') as f:
             for i,data in enumerate(self.class_names):
                 f.write("%s\n" % data)
-        wandb.init(project=f"simple_cnn-{os.path.basename(self.image_dir)}".replace("/", "-"), config=cfg)
-        
+
         try:
             os.makedirs(self.checkpoints_dir, exist_ok=True)
         except OSError:
@@ -57,16 +58,18 @@ class CNN_Trainer():
         device = torch.device(f"cuda:{cfg.device}" if torch.cuda.is_available() else "cpu")
         inputs, classes = next(iter(dataloaders['train']))
         out = torchvision.utils.make_grid(inputs)
-        images = wandb.Image(out, caption=f"Sample_Batch-{os.path.basename(self.image_dir)}")
         
-        num_ftrs = model.fc.in_features
-        model.fc = nn.Linear(num_ftrs, len(self.class_names))
+        # Loard pre-trained model
+        model_ = ModelArchitecture(model=cfg.model)
+        model = model_.getModel(model,len(self.class_names))
         model = model.to(device)
 
-        
+        # wandb initialization
+        wandb.init(project=f"simple_cnn-{os.path.basename(self.image_dir)}".replace("/", "-"), config=cfg)
+        images = wandb.Image(out, caption=f"Sample_Batch-{os.path.basename(self.image_dir)}")
         wandb.watch(model, criterion, log="all", log_freq=10)
         wandb.log({"images": images
-                        })
+                       })
         
         model_configs(cfg=cfg)
         best_model_wts = copy.deepcopy(model.state_dict())
@@ -86,6 +89,7 @@ class CNN_Trainer():
 
                 # Iterate over data.
                 for inputs, labels in tqdm(dataloaders[phase]):
+                    sleep(0.01)
                     inputs = inputs.to(device)
                     labels = labels.to(device)
                     optimizer.zero_grad()
@@ -109,7 +113,7 @@ class CNN_Trainer():
 
                 get_accuracy(phase,epoch_loss,epoch_acc)
                 wandb_logs(phase,epoch_loss,epoch_acc) # wandb log loss and accuracy
-                #print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
+                
 
                 # deep copy the model
                 if phase == 'val' and epoch_acc > best_acc:
@@ -134,7 +138,7 @@ class CNN_Trainer():
     def onnx_export(self,model,img_size=224,c_in=3,):
 
         input_shape = (c_in, img_size, img_size)
-        model_prefix = os.path.basename(self.image_dir)
+        model_prefix = os.path.basename(self.image_dir) + "_" + cfg.model
         counter = 1
     
         while os.path.exists(os.path.join(self.checkpoints_dir, f'{model_prefix + "_exp_" + str(counter)}.onnx')):
