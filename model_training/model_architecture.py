@@ -38,7 +38,7 @@ class ModelArchitecture():
             print('Available Models')
             model_table = [["Resnet",["resnet18","resnet34","resnet50","resnet101","resnet152"]],
                           ["VGG",["vgg13","vgg13_bn","vgg16","vgg16_bn","vgg19","vgg19_bn"]],
-                          ["Densenet",["densenet121", "densenet169", "densenet161" ,"densenet201]"]],
+                          ["Densenet",["densenet121", "densenet169", "densenet161" ,"densenet201"]],
                           ["Squeezenet",["squeezenet1_0","squeezenet1_1"]],
                           ["Alexnet", ["alexnet"]]]
             headers = ["Architectures", "Available Models"]

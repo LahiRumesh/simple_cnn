@@ -6,9 +6,6 @@ from torch.optim import lr_scheduler
 from torch.utils.data import Dataset,DataLoader
 from torchvision import transforms,models
 
-
-
-
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
@@ -19,11 +16,6 @@ class Simple_CNN_Trainer():
         self.num_epochs=num_epochs
         self.train_loader=train_loader
         self.test_loader=test_loader
-
-    
-    
-    
-    
     
     model_ft = models.resnet18(pretrained=True)
     num_ftrs = model_ft.fc.in_features
@@ -70,8 +62,6 @@ class Simple_CNN_Trainer():
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
-
-        print('Test Accuracy of the model on the 10000 test images: {} %'.format(2 * correct / total))
 
     # Save the model checkpoint
     torch.save(model.state_dict(), 'model.ckpt')
