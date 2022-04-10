@@ -43,11 +43,35 @@ ___
     cfg.epochs = 50 #number of epochs
 
     cfg.model = 'resnet18' # torch vision classification model architectures for image classification 
-                           # i.e. resnet18 or resnet50, resnet101, resnet152
+                           # i.e. resnet18 or vgg16, alexnet, densenet121, squeezenet1_0
 
     cfg.pretrained = True  # use pretrained weights for training-                    
 ```
-- Please checkout for more [MODELS AND PRE-TRAINED WEIGHTS](https://pytorch.org/vision/stable/models.html) from PyTorch 
 
-Run **cnn_train.py** to start the training, all the logs will be save in [wandb](https://wandb.ai/site), and ONNX weight files will save in the "**_models/Image_Folder_**" folder for each training experiments. 
+
+- Here are the Available pre-trained models in ```Simple CNN```
+
+  <table border="3">
+  <tr>
+  <td><b>Architectures</td>
+  <td><b>Available Models</td>
+  </tr>
+  <td>Resnet</td>
+  <td>resnet18, resnet34, resnet50, resnet101, resnet152</td>
+  <tr>
+  <td>VGG</td>
+  <td>vgg13, vgg13_bn, vgg16, vgg16_bn, vgg19, vgg19_bn</td>
+  <tr>
+  <td>Densenet</td>
+  <td>densenet121, densenet169, densenet161 , densenet201</td>
+  <tr>
+  <td>Squeezenet</td>
+  <td>squeezenet1_0, squeezenet1_1</td>
+  <tr>
+  <td>Alexnet</td>
+  <td>alexnet</td>
+  </table
+
+
+Run **cnn_train.py** to start the training, all the logs will be save in [wandb](https://wandb.ai/site), and ONNX weight files will save in the "**_models/Image_Folder_**" folder for each training experiments with the model name. 
 
