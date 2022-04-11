@@ -2,7 +2,7 @@ import onnx
 import numpy as np
 import onnxruntime as rt
 import cv2
-
+import argparse
 
 class CNNInference():
     def __init__(self,model_path,img_size,classes_path) -> None:
@@ -14,6 +14,11 @@ class CNNInference():
         self.session = rt.InferenceSession(model.SerializeToString())
 
     def get_image(self, path, show=False):
+        '''
+        Read the image and disply 
+        path : input image path
+        show : display the image
+        '''
         img = cv2.imread(path)
         if show:
             cv2.imshow("Frame",img)
@@ -22,6 +27,12 @@ class CNNInference():
 
 
     def preprocess(self, img, use_transform=False):
+                
+        '''
+        Image Pre-processing steps for inference
+        img : image
+        use_transform : use trasfromation step
+        '''
         img = img / 255.
         img = cv2.resize(img, (self.img_size, self.img_size))        
         if use_transform:
@@ -41,7 +52,6 @@ class CNNInference():
 
         '''
         Read the class file and return class names as an array
-        args : class file (classes.txt)
         '''
         with open(self.classes_path) as f:
             class_names = f.readlines()
@@ -66,10 +76,13 @@ class CNNInference():
 
 if __name__ == '__main__':
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--model_path', type=str, default='models/cat_and_dogs/cat_and_dogs_resnet18_exp_1.onnx', help='ONNX model path')
+    parser.add_argument('--class_path', type=str, default='models/cat_and_dogs/classes.txt', help='Class file path which contain class names')
+    parser.add_argument('--img_path', type=str, default='Data/cat_and_dogs/test/dogs/dog.4033.jpg', help='Input Image path')
+    parser.add_argument('--image_size', type=int, default=224, help='Input Image size (Used for the training)')
+    args = parser.parse_args()
 
-    model_path = '/home/lahiru/Computer_Vision/Classification/simple_cnn/models/cat_and_dogs/cat_and_dogs_resnet18_exp_1.onnx'
-    class_path = '/home/lahiru/Computer_Vision/Classification/simple_cnn/models/cat_and_dogs/classes.txt'
-    cnn_infer = CNNInference(model_path,224,class_path)
-    img_path = '/home/lahiru/Computer_Vision/Classification/Data/cat_and_dogs/val/dogs/dog.4033.jpg'
-    cnn_infer.predict(img_path)
+    cnn_infer = CNNInference(args.model_path,args.image_size,args.class_path)
+    cnn_infer.predict(args.img_path)
 
