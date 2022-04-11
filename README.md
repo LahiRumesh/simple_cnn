@@ -129,7 +129,9 @@ python cnn_inference.py --model_path=models/ImageFolder/ImageFolder_resnet18_exp
     --model_path :  ONNX model path
     --class_path : Class file (classes.txt) path contain class names
     --img_path  : Input image path
-    --image_size : input image size                    
+    --image_size : input image size
+    --show_image : Display the image
+    --use_transform : Use image transforms in pre-processing step                    
 ```
 ---
 

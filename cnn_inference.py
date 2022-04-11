@@ -86,8 +86,10 @@ if __name__ == '__main__':
     parser.add_argument('--class_path', type=str, default='models/cat_and_dogs/classes.txt', help='Class file path which contain class names')
     parser.add_argument('--img_path', type=str, default='Data/cat_and_dogs/test/dogs/dog.4033.jpg', help='Input Image path')
     parser.add_argument('--image_size', type=int, default=224, help='Input Image size (Used for the training)')
+    parser.add_argument('--show_image', type=bool, default=False, help='Display the image')
+    parser.add_argument('--use_transform', type=bool, default=False, help='Use image transforms in pre-processing step')
     args = parser.parse_args()
 
     cnn_infer = CNNInference(args.model_path,args.image_size,args.class_path)
-    cnn_infer.predict(args.img_path)
+    cnn_infer.predict(args.img_path,show_img=args.show_image,use_transform=args.use_transform)
 
