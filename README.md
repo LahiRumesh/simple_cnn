@@ -110,7 +110,7 @@ ___
   </table
 
 
-Run **cnn_train.py** to start the training, all the logs will be save in [wandb](https://wandb.ai/site), and ONNX weight files will save in the "**_models/Image_Folder_**" folder for each training experiments with the model name. 
+Run **cnn_train.py** to start the training, all the logs will save in [wandb](https://wandb.ai/site), and ONNX weight files will save in the "**_models/Image_Folder_**" folder for each training experiment with the model name. 
 
 ---
 
