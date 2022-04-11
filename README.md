@@ -17,42 +17,54 @@ ___
 
 - Split images into **train** and **val** folders with each class the Image Folder 📂.. i.e for cat vs dogs classification, there should be a cat folder and dog folder in both train and val. The following folder structure illustrates 3 classes
 
- * #### Image Folder
-    * **train**
-      * class1
-        * image1.jpg
-        * image2.jpg
-        * image3.jpg
-        * ..........
-      * class2
-        * image11.jpg
-        * image12.jpg
-        * image13.jpg
-        * ..........
-      * class3
-        * image21.jpg
-        * image22.jpg
-        * image23.jpg
-        * ..........
-        <br>
-        <br>
-    * **val**
-      * class1
-        * image31.jpg
-        * image32.jpg
-        * image33.jpg
-        * ..........
-      * class2
-        * image41.jpg
-        * image42.jpg
-        * image43.jpg
-        * ..........
-      * class3
-        * image51.jpg
-        * image52.jpg
-        * image53.jpg
-        * ..........
 
+```bash
+├── Image_Folder
+     ├── train
+     │   │───── class1
+     │   │     ├── class1.0.jpg
+     │   │     ├── class1.1.jpg
+     │   │     ├── class1.2.jpg
+     │   │     ├── .........
+     │   │     └── class1.500.jpg
+     │   │
+     │   │───── class2
+     │   │     ├── class2.0.jpg
+     │   │     ├── class2.1.jpg
+     │   │     ├── class2.2.jpg
+     │   │     ├── .........
+     │   │     └── class2.500.jpg
+     │   │
+     │   └───── class3
+     │          ├── class3.0.jpg
+     │          ├── class3.1.jpg
+     │          ├── class3.2.jpg
+     │          ├── .........
+     │          └── class3.500.jpg   
+     │
+     └── val
+         │───── class1
+         │     ├── class1.501.jpg
+         │     ├── class1.502.jpg
+         │     ├── class1.503.jpg
+         │     ├── .........
+         │     └── class1.600.jpg
+         │
+         │───── class2
+         │     ├── class2.501.jpg
+         │     ├── class2.502.jpg
+         │     ├── class2.503.jpg
+         │     ├── .........
+         │     └── class2.600.jpg
+         │
+         └───── class3
+               ├── class3.501.jpg
+               ├── class3.502.jpg
+               ├── class3.503.jpg
+               ├── .........
+               └── class3.600.jpg
+
+```
 
 ---
 
