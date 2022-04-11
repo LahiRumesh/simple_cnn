@@ -94,3 +94,10 @@ python cnn_inference.py --model_path=models/ImageFolder/ImageFolder_resnet18_exp
     --img_path  : Input image path
     --image_size : input image size                    
 ```
+---
+
+### Reference:
+
+- [PyTorch TRANSFER LEARNING FOR COMPUTER VISION](https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html)
+- [PyTorch MODELS AND PRE-TRAINED WEIGHTS](https://pytorch.org/vision/stable/models.html)
+- [ONNX Model Zoo](https://github.com/onnx/models)
