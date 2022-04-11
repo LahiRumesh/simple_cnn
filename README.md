@@ -15,19 +15,44 @@ ___
 
 ### Data Preparation
 
-- Split images into **train** and **val** folders in the Image Folder 📂
+- Split images into **train** and **val** folders with each class the Image Folder 📂.. i.e for cat vs dogs classification, there should be a cat folder and dog folder in both train and val. The following folder structure illustrates 3 classes
 
  * #### Image Folder
     * **train**
-      * image1.jpg
-      * image2.jpg
-      * image3.jpg
-      * ..............
+      * class1
+        * image1.jpg
+        * image2.jpg
+        * image3.jpg
+        * ..........
+      * class2
+        * image11.jpg
+        * image12.jpg
+        * image13.jpg
+        * ..........
+      * class3
+        * image21.jpg
+        * image22.jpg
+        * image23.jpg
+        * ..........
+        <br>
+        <br>
     * **val**
-      * image101.jpg
-      * image102.jpg
-      * image103.jpg
-      * ..............
+      * class1
+        * image31.jpg
+        * image32.jpg
+        * image33.jpg
+        * ..........
+      * class2
+        * image41.jpg
+        * image42.jpg
+        * image43.jpg
+        * ..........
+      * class3
+        * image51.jpg
+        * image52.jpg
+        * image53.jpg
+        * ..........
+
 
 ---
 
