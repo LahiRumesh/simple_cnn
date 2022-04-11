@@ -7,7 +7,7 @@ ___
 - Clone the repo and install **requirements.txt** in a Python environment 
 
 ```bash
-    git clone git@github.com:LahiRumesh/simple_cnn.git
+    git clone https://github.com/LahiRumesh/simple_cnn.git
     cd simple_cnn
     pip install -r requirements.txt
 ```
@@ -116,7 +116,7 @@ Run **cnn_train.py** to start the training, all the logs will be save in [wandb]
 
 ### Inference
 
-- After the training process used the exported ONNX model for inference using **cnn_inference.py**
+- After the training process, use the exported ONNX model for inference using **cnn_inference.py**
 
 ```bash
 python cnn_inference.py --model_path=models/ImageFolder/ImageFolder_resnet18_exp_1.onnx --class_path=ImageFolder/ImageFolder/classes.txt --img_path=test1.jpg --image_size=224 
