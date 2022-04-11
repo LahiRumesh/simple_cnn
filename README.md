@@ -119,7 +119,7 @@ Run **cnn_train.py** to start the training, all the logs will save in [wandb](ht
 - After the training process, use the exported ONNX model for inference using **cnn_inference.py**
 
 ```bash
-python cnn_inference.py --model_path=models/ImageFolder/ImageFolder_resnet18_exp_1.onnx --class_path=ImageFolder/ImageFolder/classes.txt --img_path=test1.jpg --image_size=224 
+python cnn_inference.py --model_path=models/ImageFolder/ImageFolder_resnet18_exp_1.onnx --class_path=ImageFolder/ImageFolder/classes.txt --img_path=test1.jpg --image_size=224 --use_transform=True
 ```
 
  ```bash
@@ -131,7 +131,7 @@ python cnn_inference.py --model_path=models/ImageFolder/ImageFolder_resnet18_exp
     --img_path  : Input image path
     --image_size : input image size
     --show_image : Display the image
-    --use_transform : Use image transforms in pre-processing step                    
+    --use_transform : Use image transforms in pre-processing step (During the training, process images are Normalize with a mean and standard deviation)                 
 ```
 ---
 

@@ -77,17 +77,17 @@ class CNNInference():
 if __name__ == '__main__':
 
     '''
-    python cnn_inference.py --model_path=models/cat_and_dogs/cat_and_dogs_resnet18_exp_1.onnx --class_path=models/cat_and_dogs/classes.txt --img_path=test1.jpg --image_size=224
+    python cnn_inference.py --model_path=models/cats_vs_dogs/cats_vs_dogs_resnet18_exp_1.onnx --class_path=models/cats_vs_dogs/classes.txt --img_path=test1.jpg --image_size=224 --use_transform=True
     
     '''
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model_path', type=str, default='models/cat_and_dogs/cat_and_dogs_resnet18_exp_1.onnx', help='ONNX model path')
-    parser.add_argument('--class_path', type=str, default='models/cat_and_dogs/classes.txt', help='Class file path which contain class names')
-    parser.add_argument('--img_path', type=str, default='Data/cat_and_dogs/test/dogs/dog.4033.jpg', help='Input Image path')
+    parser.add_argument('--model_path', type=str, default='models/cats_vs_dogs/cats_vs_dogs_resnet18_exp_1.onnx', help='ONNX model path')
+    parser.add_argument('--class_path', type=str, default='models/cats_vs_dogs/classes.txt', help='Class file path which contain class names')
+    parser.add_argument('--img_path', type=str, default='test1.jpg', help='Input Image path')
     parser.add_argument('--image_size', type=int, default=224, help='Input Image size (Used for the training)')
-    parser.add_argument('--show_image', type=bool, default=False, help='Display the image')
-    parser.add_argument('--use_transform', type=bool, default=False, help='Use image transforms in pre-processing step')
+    parser.add_argument('--show_image', type=bool, default=True, help='Display the image')
+    parser.add_argument('--use_transform', type=bool, default=True, help='Use image transforms in pre-processing step')
     args = parser.parse_args()
 
     cnn_infer = CNNInference(args.model_path,args.image_size,args.class_path)
