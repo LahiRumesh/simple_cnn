@@ -36,14 +36,15 @@ class CNN_Trainer():
         self.dataset_sizes = {x: len(self.image_datasets[x]) for x in ['train', 'val']}
         self.class_names = self.image_datasets['train'].classes
         self.checkpoints_dir = os.path.join("models", os.path.basename(self.image_dir))
-        with open(os.path.join(self.checkpoints_dir,'classes.txt'), 'w') as f:
-            for i,data in enumerate(self.class_names):
-                f.write("%s\n" % data)
 
         try:
             os.makedirs(self.checkpoints_dir, exist_ok=True)
         except OSError:
             pass
+
+        with open(os.path.join(self.checkpoints_dir,'classes.txt'), 'w') as f:
+            for i,data in enumerate(self.class_names):
+                f.write("%s\n" % data)
 
     def train_model(self,model, criterion,
                         optimizer, scheduler, num_epochs=25,
