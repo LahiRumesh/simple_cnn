@@ -75,3 +75,22 @@ ___
 
 Run **cnn_train.py** to start the training, all the logs will be save in [wandb](https://wandb.ai/site), and ONNX weight files will save in the "**_models/Image_Folder_**" folder for each training experiments with the model name. 
 
+---
+
+### Inference
+
+- After the training process used the exported ONNX model for inference using **cnn_inference.py**
+
+```bash
+python cnn_inference.py --model_path=models/ImageFolder/ImageFolder_resnet18_exp_1.onnx --class_path=ImageFolder/ImageFolder/classes.txt --img_path=test1.jpg --image_size=224 
+```
+
+ ```bash
+ '''
+  Args:
+ '''
+    --model_path :  ONNX model path
+    --class_path : Class file (classes.txt) path contain class names
+    --img_path  : Input image path
+    --image_size : input image size                    
+```
