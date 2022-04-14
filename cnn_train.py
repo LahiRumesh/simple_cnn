@@ -26,7 +26,14 @@ class CNN_Trainer():
 
     def __init__(self,image_dir,
                       data_transforms) -> None:
+        
+        '''
+        load the images from the folder and use data transforms
 
+        image_dir : path of the image folder
+        data_transforms : data transforms
+
+        '''
         self.image_dir = image_dir
         self.data_transforms = data_transforms
         self.image_datasets = {x: datasets.ImageFolder(os.path.join(self.image_dir, x),
@@ -117,18 +124,13 @@ class CNN_Trainer():
                 
 
                 # deep copy the model
+
                 if phase == 'val' and epoch_acc > best_acc:
                     best_acc = epoch_acc
                     best_model_wts = copy.deepcopy(model.state_dict())
 
             print()
-        
-        try:
-            print(f'Best Val Accuracy: {best_acc:4f}')
-        
-        except KeyboardInterrupt:
-            print(f'Best Val Accuracy: {best_acc:4f} Training Interrupted... Exporting ONNX model')
-        
+                
 
         # load best model weights and return for export
         model.load_state_dict(best_model_wts)
@@ -138,6 +140,15 @@ class CNN_Trainer():
 
     def onnx_export(self,model,img_size=224,c_in=3,):
 
+        '''
+        Export the onnx model from the best weight file,
+
+        model : trained model
+        img_size : train image size
+        c_in : colour channels (r,g,b)
+
+        '''
+
         input_shape = (c_in, img_size, img_size)
         model_prefix = os.path.basename(self.image_dir) + "_" + cfg.model
         counter = 1
@@ -145,6 +156,11 @@ class CNN_Trainer():
         while os.path.exists(os.path.join(self.checkpoints_dir, f'{model_prefix + "_exp_" + str(counter)}.onnx')):
             counter += 1
         
+        #
+        # if you are using cpu for training use dummy input as 
+        # dummy_input = Variable(torch.randn(1, *input_shape))
+        #
+
         dummy_input = Variable(torch.randn(1, *input_shape,device="cuda"))
         torch_onnx.export(model, 
                           dummy_input, 
@@ -182,6 +198,13 @@ if __name__ == '__main__':
     exp_lr_scheduler = getattr(lr_scheduler, cfg.lr_scheduler)(optimizer, step_size=cfg.steps, gamma=cfg.gamma)
 
     cnn_model = train_CNN.train_model(model,loss_criterion,optimizer,exp_lr_scheduler,num_epochs=cfg.epochs)
-
+    
     # export the ONNX model
+    
     train_CNN.onnx_export(cnn_model,img_size=cfg.image_size)
+        
+
+
+    
+
+   
