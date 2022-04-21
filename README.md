@@ -82,7 +82,12 @@ ___
     cfg.model = 'resnet18' # torch vision classification model architectures for image classification 
                            # i.e. resnet18 or vgg16, alexnet, densenet121, squeezenet1_0
 
-    cfg.pretrained = True  # use pretrained weights for training-                    
+    cfg.pretrained = True  # use pretrained weights for training
+
+    #Early Stopping
+    cfg.use_early_stopping = True # use Early stopping
+    cfg.patience = 8 # how many epochs to wait before stopping when accuracy is not improving
+    cfg.min_delta = 0.0001 # minimum difference between new accuracy and old accuracy for new accuracy to be considered as an improvement                   
 ```
 
 
