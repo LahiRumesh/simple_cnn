@@ -1,4 +1,3 @@
-from statistics import mode
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -15,6 +14,7 @@ import wandb
 from tqdm import tqdm
 from time import sleep
 from log_data import model_configs, wandb_logs, get_accuracy
+from model_training.early_stop import EarlyStopping
 from model_training.model_architecture import ModelArchitecture
 cudnn.benchmark = True
 wandb.login() #login to wandb account
@@ -56,7 +56,7 @@ class CNN_Trainer():
     def train_model(self,model, criterion,
                         optimizer, scheduler, num_epochs=25,
                         batch_size=4,
-                        shuffle=True,num_workers=4):
+                        shuffle=True,num_workers=4,patience=10,min_delta=0,use_early_stopping=True):
 
 
         dataloaders = {x: torch.utils.data.DataLoader(self.image_datasets[x], batch_size=batch_size,
@@ -79,7 +79,8 @@ class CNN_Trainer():
         wandb.log({"images": images
                        })
         
-        model_configs(cfg=cfg)
+        model_configs(cfg=cfg,classes=self.class_names)
+        early_stopping = EarlyStopping(patience=cfg.patience, min_delta=cfg.min_delta)
         best_model_wts = copy.deepcopy(model.state_dict())
         best_acc = 0.0
 
@@ -122,13 +123,19 @@ class CNN_Trainer():
                 get_accuracy(phase,epoch_loss,epoch_acc)
                 wandb_logs(phase,epoch_loss,epoch_acc) # wandb log loss and accuracy
                 
-
                 # deep copy the model
 
-                if phase == 'val' and epoch_acc > best_acc:
-                    best_acc = epoch_acc
-                    best_model_wts = copy.deepcopy(model.state_dict())
+                if phase == 'val':
+                    
+                    if cfg.use_early_stopping:
+                        early_stopping(epoch_acc,epoch)
 
+                    if epoch_acc > best_acc:
+                        best_acc = epoch_acc
+                        best_model_wts = copy.deepcopy(model.state_dict())
+
+            if cfg.use_early_stopping and early_stopping.early_stop:
+                break
             print()
                 
 

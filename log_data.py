@@ -4,7 +4,7 @@ import wandb
 
 
 
-def model_configs(cfg):
+def model_configs(cfg,classes):
     
     header = f"Training {os.path.basename(cfg.data_dir)} Data Set"
     print('-' * len(header))
@@ -22,7 +22,9 @@ def model_configs(cfg):
                     ["Optimizer",cfg.optimizer],
                     ["Learning Rate Decay",cfg.lr_scheduler],
                     ["Decay epochs ",cfg.steps],
-                    ["Decay Learning Rate factor ",cfg.optimizer]]
+                    ["Decay Learning Rate factor ",cfg.optimizer],
+                    ["Classes", str(classes)],
+                    ["Number of Classes", len(classes)]]
     print(tabulate(config_table,tablefmt="fancy_grid"))
 
 
