@@ -20,8 +20,6 @@ cudnn.benchmark = True
 wandb.login() #login to wandb account
 
 
-
-
 class CNN_Trainer():
 
     def __init__(self,image_dir,
@@ -204,14 +202,9 @@ if __name__ == '__main__':
     # Decay Learning Rate
     exp_lr_scheduler = getattr(lr_scheduler, cfg.lr_scheduler)(optimizer, step_size=cfg.steps, gamma=cfg.gamma)
 
-    cnn_model = train_CNN.train_model(model,loss_criterion,optimizer,exp_lr_scheduler,num_epochs=cfg.epochs)
+    cnn_model = train_CNN.train_model(model,loss_criterion,optimizer,exp_lr_scheduler,num_epochs=cfg.epochs,batch_size=cfg.batch_size)
     
     # export the ONNX model
     
     train_CNN.onnx_export(cnn_model,img_size=cfg.image_size)
         
-
-
-    
-
-   
