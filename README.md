@@ -124,8 +124,10 @@ Run **cnn_train.py** to start the training, all the logs will save in [wandb](ht
 - After the training process, use the exported ONNX model for inference using **cnn_inference.py**
 
 ```bash
-python cnn_inference.py --model_path=models/ImageFolder/ImageFolder_resnet18_exp_1.onnx --class_path=ImageFolder/ImageFolder/classes.txt --img_path=test1.jpg --image_size=224 --use_transform=True
+python cnn_inference.py --model_path=models/ImageFolder/ImageFolder_resnet18_exp_1.onnx --class_path=models/ImageFolder/classes.txt --img_path=test1.jpg --image_size=224 --use_transform=True
 ```
+
+
 
  ```bash
  '''
@@ -138,6 +140,57 @@ python cnn_inference.py --model_path=models/ImageFolder/ImageFolder_resnet18_exp
     --show_image : Display the image
     --use_transform : Use image transforms in pre-processing step (During the training, process images are Normalize with a mean and standard deviation)                 
 ```
+
+---
+
+### Calculate Test Accuracy
+
+- Use the **test_accuracy.py** to calculate the ONNX model accuracy on the test data.
+
+```bash
+python test_accuracy.py --model_path=models/ImageFolder/ImageFolder_resnet18_exp_1.onnx --class_path=models/ImageFolder/classes.txt --img_dir=Image_Folder/test --image_size=224 --use_transform=True
+```
+The following illustrates 3 classes of the test image folder
+
+```bash
+├── Image_Folder
+     ├── test
+        │───── class1
+        │     ├── class1.0.jpg
+        │     ├── class1.1.jpg
+        │     ├── class1.2.jpg
+        │     ├── .........
+        │     └── class1.500.jpg
+        │
+        │───── class2
+        │     ├── class2.0.jpg
+        │     ├── class2.1.jpg
+        │     ├── class2.2.jpg
+        │     ├── .........
+        │     └── class2.500.jpg
+        │
+        └───── class3
+               ├── class3.0.jpg
+               ├── class3.1.jpg
+               ├── class3.2.jpg
+               ├── .........
+               └── class3.500.jpg   
+     
+```
+
+All the test results will save in the folder "**_test_results_**" folder for each test experiment.
+
+ ```bash
+ '''
+  Args:
+ '''
+    --model_path :  ONNX model path
+    --class_path : Class file (classes.txt) path contain class names
+    --img_dir  : Test images folder path
+    --image_size : input image size
+    --use_transform : Use image transforms in pre-processing step (During the training, process images are Normalize with a mean and standard deviation)                 
+```
+
 ---
 
 ### Reference:
