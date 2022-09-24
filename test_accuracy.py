@@ -134,14 +134,14 @@ class CalAccuracy():
 if __name__ == '__main__':
 
     '''
-    python test_accuracy.py --model_path=models/cats_vs_dogs/cats_vs_dogs_resnet18_exp_1.onnx --class_path=models/cats_vs_dogs/classes.txt --img_path=test1.jpg --image_size=224 --use_transform=True
+    python test_accuracy.py --model_path=models/cats_vs_dogs/cats_vs_dogs_resnet18_exp_1.onnx --class_path=models/cats_vs_dogs/classes.txt --img_dir=Classification/Data/cats_vs_dogs/test --image_size=224 --use_transform=True
     
     '''
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_path', type=str, default='models/cats_vs_dogs/cats_vs_dogs_resnet50_exp_8.onnx', help='ONNX model path')
     parser.add_argument('--class_path', type=str, default='models/cats_vs_dogs/classes.txt', help='Class file path which contain class names')
-    parser.add_argument('--img_dir', type=str, default='/home/lahiru/Computer_Vision/Classification/Data/cats_vs_dogs/val', help='Test Images Dir path')
+    parser.add_argument('--img_dir', type=str, default='Classification/Data/cats_vs_dogs/test', help='Test Images Dir path')
     parser.add_argument('--image_size', type=int, default=224, help='Input Image size (Used for the training)')
     parser.add_argument('--use_transform', type=bool, default=True, help='Use image transforms in pre-processing step')
     args = parser.parse_args()
